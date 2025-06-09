@@ -9,25 +9,30 @@
         android:id="@+id/questionText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="22sp"
         android:text="Pytanie"
-        android:textSize="22sp"
-        android:layout_marginBottom="16dp" />
+        android:layout_gravity="center"
+        android:textSize="22sp" />
 
     <TextView
         android:id="@+id/answerText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Odpowiedź"
-        android:textSize="18sp"
+        android:layout_gravity="center"
+        android:textSize="24sp"
         android:layout_marginBottom="24dp" />
 
     <Button
         android:id="@+id/speakButton"
-        android:layout_width="wrap_content"
+        android:layout_width="354dp"
         android:layout_height="wrap_content"
-        android:text="🔊 Odsłuchaj"
         android:layout_gravity="center"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="16dp"
+        android:text="🔊 Odsłuchaj"
+        android:backgroundTint="@color/blue"
+        />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -35,24 +40,29 @@
         android:gravity="center"
         android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/knowButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="✅ Umiem" />
-
-        <Button
-            android:id="@+id/maybeButton"
-            android:layout_width="123dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="🤔 Zastanawiałem się" />
-
-        <Button
-            android:id="@+id/dontKnowButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="❌ Nie umiem"
-            android:layout_marginStart="8dp" />
     </LinearLayout>
+
+    <Button
+        android:id="@+id/knowButton"
+        android:layout_width="354dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="✅ Umiem" />
+
+    <Button
+        android:id="@+id/maybeButton"
+        android:layout_width="354dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="🤔 Zastanawiałem się" />
+
+    <Button
+        android:id="@+id/dontKnowButton"
+        android:layout_width="354dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="❌ Nie umiem" />
 </LinearLayout>

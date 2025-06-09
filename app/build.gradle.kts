@@ -34,6 +34,10 @@ android {
 dependencies {
     implementation (libs.androidx.room.runtime)
     implementation(libs.image.labeling.custom.common)
+    implementation(libs.object1.detection.common)
+    implementation(libs.object1.detection)
+
+
     annotationProcessor (libs.androidx.room.compiler)
     implementation(libs.appcompat)
     implementation(libs.material)

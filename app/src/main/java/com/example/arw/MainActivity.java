@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         translationText = findViewById(R.id.translationText);
 
         Button saveButton = findViewById(R.id.saveButton);
-        Button speakButton = findViewById(R.id.speakButton);
+
         Button studyButton = findViewById(R.id.studyButton);
 
         translatorHelper = new TranslatorHelper(this);
