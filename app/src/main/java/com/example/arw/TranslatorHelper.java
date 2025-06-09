@@ -17,8 +17,8 @@ public class TranslatorHelper {
 
     public TranslatorHelper(Context context) {
         TranslatorOptions options = new TranslatorOptions.Builder()
-                .setSourceLanguage(TranslateLanguage.POLISH)
-                .setTargetLanguage(TranslateLanguage.ENGLISH)
+                .setSourceLanguage(TranslateLanguage.ENGLISH)
+                .setTargetLanguage(TranslateLanguage.POLISH)
                 .build();
 
         translator = Translation.getClient(options);
@@ -29,7 +29,11 @@ public class TranslatorHelper {
     }
 
     public void translate(String text, TranslationCallback callback) {
-        translator.translate(text)
+        String cleaned = text.toLowerCase().trim();
+        if (cleaned.contains(" ")) {
+            cleaned = cleaned.split(" ")[0];
+        }
+        translator.translate(cleaned)
                 .addOnSuccessListener(callback::onTranslated)
                 .addOnFailureListener(e -> {
                     Log.e("TranslatorHelper", "Błąd tłumaczenia", e);

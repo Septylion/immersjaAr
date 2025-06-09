@@ -43,10 +43,10 @@
 
         <Button
             android:id="@+id/maybeButton"
-            android:layout_width="wrap_content"
+            android:layout_width="123dp"
             android:layout_height="wrap_content"
-            android:text="🤔 Zastanawiałem się"
-            android:layout_marginStart="8dp" />
+            android:layout_marginStart="8dp"
+            android:text="🤔 Zastanawiałem się" />
 
         <Button
             android:id="@+id/dontKnowButton"
