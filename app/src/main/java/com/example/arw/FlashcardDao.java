@@ -21,6 +21,10 @@ public interface FlashcardDao {
 
     @Query("SELECT * FROM flashcard")
     List<Flashcard> getAll();
+
+    @Query("SELECT * FROM flashcard WHERE word = :word LIMIT 1")
+    Flashcard getFlashcardByWord(String word);
+
 }
 
 

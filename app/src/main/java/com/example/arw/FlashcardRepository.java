@@ -24,4 +24,8 @@ public class FlashcardRepository {
     public void insert(Flashcard flashcard) {
         Executors.newSingleThreadExecutor().execute(() -> flashcardDao.insert(flashcard));
     }
+
+    public Flashcard getFlashcardByWord(String word) {
+        return flashcardDao.getFlashcardByWord(word);
+    }
 }

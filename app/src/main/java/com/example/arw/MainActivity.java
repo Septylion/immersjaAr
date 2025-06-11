@@ -12,6 +12,7 @@ import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,6 +29,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -83,17 +85,30 @@ public class MainActivity extends AppCompatActivity {
         }
 
         saveButton.setOnClickListener(v -> {
-            String word = wordText.getText().toString();
-            String translation = translationText.getText().toString();
+            String word = wordText.getText().toString().trim();
+            String translation = translationText.getText().toString().trim();
             if (!word.isEmpty() && !translation.isEmpty()) {
-                Flashcard flashcard = new Flashcard();
-                flashcard.word = word;
-                flashcard.translation = translation;
-                flashcard.nextReviewDate = System.currentTimeMillis();
-                flashcard.difficultyLevel = 2;
-                new FlashcardRepository(this).insert(flashcard);
+                FlashcardRepository repository = new FlashcardRepository(this);
+
+
+                Executors.newSingleThreadExecutor().execute(() -> {
+                    Flashcard existing = repository.getFlashcardByWord(word);
+                    if (existing == null) {
+                        Flashcard flashcard = new Flashcard();
+                        flashcard.word = word;
+                        flashcard.translation = translation;
+                        flashcard.nextReviewDate = System.currentTimeMillis();
+                        flashcard.difficultyLevel = 2;
+                        repository.insert(flashcard);
+
+                        runOnUiThread(() -> Toast.makeText(this, "Fiszka zapisana", Toast.LENGTH_SHORT).show());
+                    } else {
+                        runOnUiThread(() -> Toast.makeText(this, "Taka fiszka już istnieje", Toast.LENGTH_SHORT).show());
+                    }
+                });
             }
         });
+
 
         studyButton.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, FlashcardStudyActivity.class);
