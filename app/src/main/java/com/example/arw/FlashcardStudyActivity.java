@@ -90,20 +90,27 @@ public class FlashcardStudyActivity extends AppCompatActivity {
         Flashcard card = flashcards.get(currentIndex);
         long now = System.currentTimeMillis();
         long interval;
-//
+
         switch (difficulty) {
-            case 0: interval = 1000L * 60 * 60 * 24 * 5 ; break;
-            case 1: interval = 1000L * 60 * 60 * 24 * 2; break;
-            default: interval = 5000 ; break;
+            case 0: interval = 1000L * 60 * 60 * 24 * 5; break; // Umiem
+            case 1: interval = 1000L * 60 * 60 * 24 * 2; break; // Zastanawiałem się
+            default: interval = 5000; break;                   // Nie umiem
         }
 
         card.nextReviewDate = now + interval;
         card.difficultyLevel = difficulty;
         repository.update(card);
 
-        currentIndex++;
+        flashcards.remove(currentIndex);
+
+
+        if (currentIndex >= flashcards.size()) {
+            currentIndex = flashcards.size() - 1;
+        }
+
         showNextFlashcard();
     }
+
 
     @Override
     protected void onDestroy() {
