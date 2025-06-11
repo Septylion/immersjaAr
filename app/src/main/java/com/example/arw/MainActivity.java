@@ -1,9 +1,13 @@
+
 package com.example.arw;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.widget.Button;
@@ -23,11 +27,11 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 101;
-
     private PreviewView previewView;
     private TextView wordText;
     private TextView translationText;
@@ -43,16 +47,19 @@ public class MainActivity extends AppCompatActivity {
         previewView = findViewById(R.id.previewView);
         wordText = findViewById(R.id.wordText);
         translationText = findViewById(R.id.translationText);
-
         Button saveButton = findViewById(R.id.saveButton);
-
         Button studyButton = findViewById(R.id.studyButton);
 
         translatorHelper = new TranslatorHelper(this);
 
         tts = new TextToSpeech(this, status -> {
             if (status == TextToSpeech.SUCCESS) {
-                tts.setLanguage(Locale.ENGLISH);
+                int result = tts.setLanguage(new Locale("pl", "PL"));
+                if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    Log.e("TTS", "Language not supported");
+                }
+            } else {
+                Log.e("TTS", "Initialization failed");
             }
         });
 
@@ -61,7 +68,10 @@ public class MainActivity extends AppCompatActivity {
                 wordText.setText(label);
                 translatorHelper.translate(label, translated -> {
                     translationText.setText(translated);
-                    tts.speak(translated, TextToSpeech.QUEUE_FLUSH, null, null);
+
+                    if (tts != null) {
+                        tts.speak(translated, TextToSpeech.QUEUE_FLUSH, null, null);
+                    }
                 });
             });
         });
@@ -75,12 +85,14 @@ public class MainActivity extends AppCompatActivity {
         saveButton.setOnClickListener(v -> {
             String word = wordText.getText().toString();
             String translation = translationText.getText().toString();
-            Flashcard flashcard = new Flashcard();
-            flashcard.word = word;
-            flashcard.translation = translation;
-            flashcard.nextReviewDate = System.currentTimeMillis();
-            flashcard.difficultyLevel = 2;
-            new FlashcardRepository(this).insert(flashcard);
+            if (!word.isEmpty() && !translation.isEmpty()) {
+                Flashcard flashcard = new Flashcard();
+                flashcard.word = word;
+                flashcard.translation = translation;
+                flashcard.nextReviewDate = System.currentTimeMillis();
+                flashcard.difficultyLevel = 2;
+                new FlashcardRepository(this).insert(flashcard);
+            }
         });
 
         studyButton.setOnClickListener(v -> {
@@ -95,16 +107,22 @@ public class MainActivity extends AppCompatActivity {
         cameraProviderFuture.addListener(() -> {
             try {
                 ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
-
                 Preview preview = new Preview.Builder().build();
                 preview.setSurfaceProvider(previewView.getSurfaceProvider());
-
                 CameraSelector cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA;
 
                 ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
                         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                         .build();
-                imageAnalysis.setAnalyzer(imageRecognizer.getExecutor(), imageRecognizer.getAnalyzer());
+
+
+                imageAnalysis.setAnalyzer(
+                        ContextCompat.getMainExecutor(this),
+                        image -> {
+                            new Handler().postDelayed(() -> {
+                                imageRecognizer.analyze(image);
+                            }, 3000); // 3 sekundy opóźnienia
+                        });
 
                 cameraProvider.unbindAll();
                 cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis);

@@ -34,7 +34,7 @@ public class FlashcardStudyActivity extends AppCompatActivity {
 
         tts = new TextToSpeech(this, status -> {
             if (status == TextToSpeech.SUCCESS) {
-                tts.setLanguage(Locale.ENGLISH);
+                tts.setLanguage(new Locale("pl", "PL"));
             }
         });
 
@@ -53,6 +53,24 @@ public class FlashcardStudyActivity extends AppCompatActivity {
                 tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
             }
         });
+
+        Button prevButton = findViewById(R.id.prevButton);
+        Button nextButton = findViewById(R.id.nextButton);
+
+        prevButton.setOnClickListener(v -> showPreviousFlashcard());
+        nextButton.setOnClickListener(v -> {
+            currentIndex++;
+            showNextFlashcard();
+        });
+
+    }
+
+
+    private void showPreviousFlashcard() {
+        if (flashcards == null || flashcards.isEmpty() || currentIndex <= 0) return;
+
+        currentIndex--;
+        showNextFlashcard();
     }
 
     private void showNextFlashcard() {
@@ -72,11 +90,11 @@ public class FlashcardStudyActivity extends AppCompatActivity {
         Flashcard card = flashcards.get(currentIndex);
         long now = System.currentTimeMillis();
         long interval;
-
+//
         switch (difficulty) {
-            case 0: interval = 1000L * 60 * 60 * 24 * 5; break;
+            case 0: interval = 1000L * 60 * 60 * 24 * 5 ; break;
             case 1: interval = 1000L * 60 * 60 * 24 * 2; break;
-            default: interval = 1000L * 60 * 60 * 24; break;
+            default: interval = 5000 ; break;
         }
 
         card.nextReviewDate = now + interval;

@@ -3,41 +3,42 @@ package com.example.arw;
 import android.content.Context;
 import android.util.Log;
 
-import com.google.mlkit.nl.translate.TranslateLanguage;
-import com.google.mlkit.nl.translate.Translation;
+import com.google.mlkit.common.model.DownloadConditions;
 import com.google.mlkit.nl.translate.Translator;
 import com.google.mlkit.nl.translate.TranslatorOptions;
+import com.google.mlkit.nl.translate.Translation;
 
 public class TranslatorHelper {
     private final Translator translator;
 
-    public interface TranslationCallback {
-        void onTranslated(String translatedText);
-    }
-
     public TranslatorHelper(Context context) {
         TranslatorOptions options = new TranslatorOptions.Builder()
-                .setSourceLanguage(TranslateLanguage.ENGLISH)
-                .setTargetLanguage(TranslateLanguage.POLISH)
+                .setSourceLanguage(com.google.mlkit.nl.translate.TranslateLanguage.ENGLISH)
+                .setTargetLanguage(com.google.mlkit.nl.translate.TranslateLanguage.POLISH)
                 .build();
 
         translator = Translation.getClient(options);
 
-        translator.downloadModelIfNeeded()
-                .addOnSuccessListener(unused -> Log.d("TranslatorHelper", "Model gotowy."))
-                .addOnFailureListener(e -> Log.e("TranslatorHelper", "Błąd pobierania modelu", e));
+        DownloadConditions conditions = new DownloadConditions.Builder().build();
+        translator.downloadModelIfNeeded(conditions)
+                .addOnSuccessListener(unused -> Log.d("TranslatorHelper", "Model downloaded"))
+                .addOnFailureListener(e -> Log.e("TranslatorHelper", "Model download failed", e));
     }
 
-    public void translate(String text, TranslationCallback callback) {
-        String cleaned = text.toLowerCase().trim();
-        if (cleaned.contains(" ")) {
-            cleaned = cleaned.split(" ")[0];
-        }
-        translator.translate(cleaned)
-                .addOnSuccessListener(callback::onTranslated)
+    public void translate(String text, OnTranslationCompleteListener listener) {
+        translator.translate(text)
+                .addOnSuccessListener(listener::onTranslated)
                 .addOnFailureListener(e -> {
-                    Log.e("TranslatorHelper", "Błąd tłumaczenia", e);
-                    callback.onTranslated("(błąd tłumaczenia)");
+                    Log.e("TranslatorHelper", "Translation failed", e);
+                    listener.onTranslated("");
                 });
+    }
+
+    public void close() {
+        translator.close();
+    }
+
+    public interface OnTranslationCompleteListener {
+        void onTranslated(String translatedText);
     }
 }
